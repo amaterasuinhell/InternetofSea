@@ -125,6 +125,50 @@ list.forEach((e,i)=>{
   scene.add(mesh);meshes.push(mesh);
 });
 
+// ---------- swimmers (decoration only: smaller than windows, not clickable) ----------
+const SWIMMERS=40;
+const VARS=[{k:"octopus",c:"#e8337f"},{k:"octopus",c:"#8a3dd8"},{k:"squid",c:"#ff7a2e"},
+  {k:"jelly",c:"#b46cff"},{k:"jelly",c:"#35d0e0"},{k:"fish",c:"#ff9a2e"},{k:"fish",c:"#47e08a"}];
+function critterTex(v,f){
+  const cv=document.createElement("canvas");cv.width=cv.height=128;
+  const c=cv.getContext("2d"),col=v.c,sg=f?1:-1;
+  c.lineCap=c.lineJoin="round";
+  const fill=()=>{c.fillStyle=col;c.fill();c.strokeStyle="#fff";c.lineWidth=5;c.stroke()};
+  const legs=L=>{[["#fff",15],[col,8]].forEach(([s,w])=>{c.strokeStyle=s;c.lineWidth=w;
+    L.forEach(([x0,y0,x1,y1,a],i)=>{const q=a*sg*(i%2?1:-1);c.beginPath();c.moveTo(x0,y0);
+      c.bezierCurveTo(x0+q,y0+(y1-y0)/3,x1-q,y0+2*(y1-y0)/3,x1,y1);c.stroke()})})};
+  const eye=(x,y)=>{c.fillStyle="#fff";c.fillRect(x-4,y-4,8,8);c.fillStyle="#102";c.fillRect(x-1,y-1,3,3)};
+  if(v.k==="octopus"){
+    legs([0,1,2,3,4,5].map(i=>[44+i*8,66,18+i*18.5,118,12]));
+    c.beginPath();c.ellipse(64,44,26,29,0,0,7);fill();eye(54,42);eye(74,42);
+  }else if(v.k==="squid"){
+    legs([0,1,2,3].map(i=>[53+i*7.5,80,44+i*13,122,8]));
+    c.beginPath();c.moveTo(64,4);c.lineTo(34,38);c.lineTo(94,38);c.closePath();fill();
+    c.beginPath();c.ellipse(64,48,17,36,0,0,7);fill();eye(57,52);eye(71,52);
+  }else if(v.k==="jelly"){
+    legs([0,1,2,3,4].map(i=>[34+i*15,56,30+i*17,122,9]));
+    c.beginPath();c.arc(64,56,36,Math.PI,0);c.closePath();fill();eye(52,44);eye(76,44);
+  }else{
+    const ty=f?8:-8;
+    c.beginPath();c.moveTo(86,64);c.lineTo(118,40+ty);c.lineTo(118,88+ty);c.closePath();fill();
+    c.beginPath();c.ellipse(56,64,36,23,0,0,7);fill();eye(36,58);
+  }
+  const t=new THREE.CanvasTexture(cv);t.minFilter=t.magFilter=THREE.NearestFilter;return t;
+}
+const critTex=VARS.map(v=>[0,1].map(f=>critterTex(v,f)));
+const crit=[],C=rng(99);
+for(let i=0;i<SWIMMERS;i++){
+  const vi=Math.floor(C()*VARS.length),k=VARS[vi].k;
+  const sz=k==="fish"?1.3+C()*1.1:k==="octopus"?2.2+C()*1.3:1.8+C()*1.4;   // windows are 3.5+ tall
+  const s=new THREE.Sprite(new THREE.SpriteMaterial({map:critTex[vi][0],alphaTest:.1}));
+  s.scale.set(sz,sz,1);
+  s.position.set((C()-.5)*2*WORLD.x,(C()-.5)*2*WORLD.y,(C()-.5)*2*WORLD.z);
+  const a=C()*6.28;
+  s.userData={vi,k,sz,ph:C()*6.28,rate:2+C()*1.5,sp:1.8+C()*2.6,frame:0,flip:1,
+    dir:new THREE.Vector3(Math.cos(a),(C()-.5)*.5,Math.sin(a)).normalize()};
+  scene.add(s);crit.push(s);
+}
+
 // ---------- controls ----------
 let yaw=0,pitch=0,active=false,locked=false,entering=null,drag=null,hover=null;
 const keys={},vel=new THREE.Vector3(),mouse=new THREE.Vector2(0,0);
@@ -218,6 +262,21 @@ function frame(now){
     const s=u.base*(m===hover?1.12:1);
     m.scale.set(s*u.flip,s,1);
     m.material.color.setHex(m===hover?0xffee88:0xffffff);
+  }
+
+  // swimmers: pulse, surge, wander (never hit by the aim ray)
+  for(const s of crit){
+    const u=s.userData,cyc=Math.sin(t*u.rate+u.ph),fish=u.k==="fish";
+    s.position.addScaledVector(u.dir,u.sp*(fish?1:.3+.7*Math.max(0,cyc))*dt);
+    u.dir.applyAxisAngle(up,dt*.5*Math.sin(t*.2+u.ph));
+    if(Math.abs(s.position.x)>WORLD.x*1.1)u.dir.x*=-Math.sign(s.position.x*u.dir.x);
+    if(Math.abs(s.position.y)>WORLD.y*1.1)u.dir.y*=-Math.sign(s.position.y*u.dir.y);
+    if(Math.abs(s.position.z)>WORLD.z*1.1)u.dir.z*=-Math.sign(s.position.z*u.dir.z);
+    const f=cyc>0?1:0;
+    if(f!==u.frame){u.frame=f;s.material.map=critTex[u.vi][f]}
+    if(fish)u.flip=u.dir.dot(camR)>0?-1:1;
+    const sq=fish?0:cyc*.1;
+    s.scale.set(u.sz*(1-sq)*u.flip,u.sz*(1+sq),1);
   }
 
   // aim
