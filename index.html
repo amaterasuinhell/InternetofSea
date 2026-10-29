@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>The Sea of Links</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+:root{--sea:#0b16b8;--ink:#fff;--hot:#ffe14a}
+html,body{margin:0;height:100%;background:var(--sea);overflow:hidden;color:var(--ink);font-family:"Courier New",monospace}
+canvas{display:block}
+body::after{content:"";position:fixed;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,.14) 0 1px,transparent 1px 3px)}
+#cross{position:fixed;left:50%;top:50%;width:12px;height:12px;margin:-6px 0 0 -6px;border:2px solid #fff;border-radius:50%;opacity:.75;pointer-events:none;transition:transform .15s}
+#cross.on{transform:scale(2.2);border-color:var(--hot)}
+#label{position:fixed;left:50%;top:calc(50% + 34px);transform:translateX(-50%);text-align:center;font-size:15px;pointer-events:none;text-shadow:0 0 6px #000;min-height:40px}
+#label small{display:block;opacity:.7;font-size:12px}
+#hud{position:fixed;left:14px;bottom:12px;font-size:12px;opacity:.75;pointer-events:none}
+#flash{position:fixed;inset:0;background:#fff;opacity:0;pointer-events:none;z-index:5}
+#intro{position:fixed;inset:0;z-index:4;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;background:rgba(6,10,90,.82);cursor:pointer;text-align:center;padding:24px}
+#intro h1{margin:0;font-size:clamp(28px,6vw,64px);font-weight:700;letter-spacing:.02em}
+#intro p{margin:0;max-width:460px;line-height:1.5;opacity:.9}
+#intro b{border:2px solid #fff;padding:8px 18px;border-radius:999px}
+@media (prefers-reduced-motion:reduce){#cross{transition:none}}
+</style>
+</head>
+<body>
+<div id="intro">
+  <h1>The Sea of Links</h1>
+  <p>Every window is a doorway to a website. Swim around, aim at one, click to dive in.</p>
+  <p>W A S D move &nbsp; mouse look &nbsp; Q / E down / up &nbsp; Shift faster</p>
+  <b>Click to start</b>
+</div>
+<div id="cross"></div>
+<div id="label"></div>
+<div id="hud">WASD move · mouse look · click a window to enter</div>
+<div id="flash"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="sites.js"></script>
+<script>
+(()=>{
+const COUNT=100, WORLD={x:75,y:30,z:75};
+const $=id=>document.getElementById(id);
+
+// ---------- data ----------
+const list=(typeof SITES!=="undefined"?SITES:[]).slice(0,COUNT).map(s=>({title:s[0]||"Untitled",url:s[1]||"",image:s[2]||"",shape:s[3]||""}));
+while(list.length<COUNT) list.push({title:"Placeholder "+String(list.length+1).padStart(3,"0"),url:"",image:"",shape:""});
+
+// aspect ratio (width / height) per shape
+const ASPECT={rect:1.4,round:1.25,oval:1.7,hex:1.1,fish:1.9,tall:.5,wide:3,whale:2.2};
+const KINDS=["rect","rect","round","round","oval","hex","fish","fish","tall","wide","wide","whale"];
+
+function rng(seed){return()=>{seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+
+// ---------- scene ----------
+const renderer=new THREE.WebGLRenderer({antialias:false});
+renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));
+renderer.setSize(innerWidth,innerHeight);
+document.body.prepend(renderer.domElement);
+const scene=new THREE.Scene();
+scene.background=new THREE.Color(0x0b16b8);
+scene.fog=new THREE.Fog(0x0b16b8,12,120);
+const camera=new THREE.PerspectiveCamera(70,innerWidth/innerHeight,.1,300);
+const START=new THREE.Vector3(0,0,62);
+camera.position.copy(START);
+camera.rotation.order="YXZ";
+
+// plankton
+{const n=900,p=new Float32Array(n*3),r=rng(5);
+ for(let i=0;i<n;i++){p[i*3]=(r()-.5)*2*WORLD.x*1.3;p[i*3+1]=(r()-.5)*2*WORLD.y*1.5;p[i*3+2]=(r()-.5)*2*WORLD.z*1.3}
+ const g=new THREE.BufferGeometry();g.setAttribute("position",new THREE.BufferAttribute(p,3));
+ scene.add(new THREE.Points(g,new THREE.PointsMaterial({color:0x8fb0ff,size:.35,fog:true})));}
+
+// ---------- window textures ----------
+function path(c,kind,w,h){
+  const m=4;c.beginPath();
+  switch(kind){
+    case"round":c.roundRect(m,m,w-2*m,h-2*m,Math.min(w,h)*.28);break;
+    case"oval":c.ellipse(w/2,h/2,w/2-m,h/2-m,0,0,Math.PI*2);break;
+    case"hex":{const k=w*.25;c.moveTo(k,m);c.lineTo(w-k,m);c.lineTo(w-m,h/2);c.lineTo(w-k,h-m);c.lineTo(k,h-m);c.lineTo(m,h/2);c.closePath();break}
+    case"fish":case"whale":
+      c.ellipse(w*.4,h/2,w*.4-m,h/2-m,0,0,Math.PI*2);
+      c.moveTo(w*.7,h/2);c.lineTo(w-m,m);c.lineTo(w-m,h-m);c.closePath();break;
+    default:c.rect(m,m,w-2*m,h-2*m);
+  }
+}
+function paint(canvas,entry,i,kind,img){
+  const c=canvas.getContext("2d"),w=canvas.width,h=canvas.height,r=rng(i*977+3),hue=(i*47)%360;
+  c.clearRect(0,0,w,h);c.save();path(c,kind,w,h);c.clip();
+  if(img){
+    const s=Math.max(w/img.width,h/img.height);
+    c.drawImage(img,(w-img.width*s)/2,(h-img.height*s)/2,img.width*s,img.height*s);
+  }else{
+    c.fillStyle=`hsl(${hue},65%,16%)`;c.fillRect(0,0,w,h);
+    c.fillStyle=`hsl(${hue},90%,62%)`;c.fillRect(0,0,w,18);
+    c.fillStyle="#fff";for(let k=0;k<3;k++)c.fillRect(8+k*12,6,7,7);
+    for(let k=0;k<7;k++){c.fillStyle=`hsla(${(hue+r()*90)%360},85%,${45+r()*25}%,.85)`;
+      c.fillRect(8+r()*w*.5,28+r()*(h-60),10+r()*w*.4,5+r()*14)}
+    c.fillStyle="#fff";c.font="bold 15px 'Courier New',monospace";c.textAlign="center";c.textBaseline="middle";
+    const fx=(kind==="fish"||kind==="whale")?w*.36:w/2;
+    c.fillText(entry.title.slice(0,20),fx,h/2+6);
+  }
+  c.restore();
+  path(c,kind,w,h);c.lineWidth=5;c.strokeStyle="#fff";c.stroke();
+}
+
+// ---------- build the sea ----------
+const meshes=[],R=rng(11);
+list.forEach((e,i)=>{
+  const kind=ASPECT[e.shape]?e.shape:KINDS[Math.floor(R()*KINDS.length)];
+  const asp=ASPECT[kind],big=kind==="whale";
+  const hgt=big?11+R()*5:3.5+R()*3.5,wid=hgt*asp;
+  const cw=192,ch=Math.max(64,Math.round(cw/asp));
+  const canvas=document.createElement("canvas");canvas.width=cw;canvas.height=ch;
+  paint(canvas,e,i,kind,null);
+  const tex=new THREE.CanvasTexture(canvas);tex.minFilter=tex.magFilter=THREE.NearestFilter;
+  if(e.image){const im=new Image();im.onload=()=>{paint(canvas,e,i,kind,im);tex.needsUpdate=true};
+    im.onerror=()=>console.warn("Image not found:",e.image);im.src=e.image}
+  const mesh=new THREE.Mesh(new THREE.PlaneGeometry(wid,hgt),
+    new THREE.MeshBasicMaterial({map:tex,transparent:true,alphaTest:.1,side:THREE.DoubleSide}));
+  let p;do{p=new THREE.Vector3((R()-.5)*2*WORLD.x,(R()-.5)*2*WORLD.y,(R()-.5)*2*WORLD.z)}while(p.distanceTo(START)<14);
+  mesh.position.copy(p);
+  const sp=(big?.5:.4+R()*1.6)*(kind==="fish"?1.6:1);
+  mesh.userData={entry:e,kind,vel:new THREE.Vector3(R()-.5,(R()-.5)*.3,R()-.5).normalize().multiplyScalar(sp),
+    tilt:(R()-.5)*1.4,roll:(R()-.5)*.8,ph:R()*6.28,k:.3+R()*.5,base:1,flip:1};
+  scene.add(mesh);meshes.push(mesh);
+});
+
+// ---------- controls ----------
+let yaw=0,pitch=0,active=false,locked=false,entering=null,drag=null,hover=null;
+const keys={},vel=new THREE.Vector3(),mouse=new THREE.Vector2(0,0);
+addEventListener("keydown",e=>{keys[e.code]=true});
+addEventListener("keyup",e=>{keys[e.code]=false});
+const intro=$("intro");
+intro.addEventListener("click",()=>{
+  active=true;intro.style.display="none";
+  try{renderer.domElement.requestPointerLock()}catch(_){}
+});
+document.addEventListener("pointerlockchange",()=>{
+  locked=document.pointerLockElement===renderer.domElement;
+  if(!locked&&active&&!entering&&!drag)intro.style.display="flex",active=false;
+});
+function look(dx,dy){yaw-=dx*.0022;pitch=Math.max(-1.5,Math.min(1.5,pitch-dy*.0022))}
+addEventListener("mousemove",e=>{
+  mouse.set(e.clientX/innerWidth*2-1,-(e.clientY/innerHeight)*2+1);
+  if(!active||entering)return;
+  if(locked)look(e.movementX,e.movementY);
+  else if(drag){look(e.movementX,e.movementY)}
+});
+renderer.domElement.addEventListener("mousedown",e=>{if(active&&!locked)drag={x:e.clientX,y:e.clientY,moved:false}});
+addEventListener("mouseup",e=>{
+  if(!active||entering)return;
+  const wasClick=locked||(drag&&Math.hypot(e.clientX-drag.x,e.clientY-drag.y)<5);
+  drag=null;
+  if(wasClick&&hover)enter(hover);
+});
+
+// ---------- entering a window ----------
+const flash=$("flash");
+function enter(mesh){
+  const e=mesh.userData.entry;
+  const dir=mesh.position.clone().sub(camera.position);
+  entering={mesh,t:0,from:camera.position.clone(),to:mesh.position.clone().sub(dir.clone().setLength(1.2)),
+    fov:camera.fov,url:e.url};
+}
+function stepEnter(dt){
+  const s=entering;s.t+=dt/1.3;
+  const k=Math.min(s.t,1),ease=k*k*k;                    // accelerating dive
+  camera.position.lerpVectors(s.from,s.to,ease);
+  camera.fov=s.fov+ease*70;camera.updateProjectionMatrix();
+  flash.style.opacity=Math.max(0,(k-.65)/.35);
+  if(k>=1){
+    if(s.url){
+      if(typeof NEW_TAB!=="undefined"&&NEW_TAB){window.open(s.url,"_blank");reset()}
+      else{location.href=s.url}
+    }else{reset();toast("No address yet for this window")}
+  }
+}
+function reset(){camera.position.copy(START);camera.fov=70;camera.updateProjectionMatrix();entering=null;vel.set(0,0,0)}
+let toastT=0;
+function toast(t){const l=$("label");l.innerHTML=t;toastT=2}
+addEventListener("pageshow",e=>{if(e.persisted)location.reload()});
+
+// ---------- loop ----------
+const ray=new THREE.Raycaster(),fwd=new THREE.Vector3(),rgt=new THREE.Vector3(),up=new THREE.Vector3(0,1,0),camR=new THREE.Vector3();
+let last=performance.now();
+function frame(now){
+  requestAnimationFrame(frame);
+  const dt=Math.min((now-last)/1000,.05),t=now/1000;last=now;
+
+  if(active&&!entering){
+    camera.rotation.set(pitch,yaw,0);
+    camera.getWorldDirection(fwd);rgt.crossVectors(fwd,up).normalize();
+    const sp=(keys.ShiftLeft||keys.ShiftRight?26:11),want=new THREE.Vector3();
+    if(keys.KeyW||keys.ArrowUp)want.add(fwd);if(keys.KeyS||keys.ArrowDown)want.sub(fwd);
+    if(keys.KeyD||keys.ArrowRight)want.add(rgt);if(keys.KeyA||keys.ArrowLeft)want.sub(rgt);
+    if(keys.KeyE||keys.Space)want.y+=1;if(keys.KeyQ||keys.KeyC)want.y-=1;
+    if(want.lengthSq())want.normalize().multiplyScalar(sp);
+    vel.lerp(want,1-Math.exp(-4*dt));
+    camera.position.addScaledVector(vel,dt);
+    camera.position.x=Math.max(-WORLD.x*1.3,Math.min(WORLD.x*1.3,camera.position.x));
+    camera.position.y=Math.max(-WORLD.y*1.4,Math.min(WORLD.y*1.4,camera.position.y));
+    camera.position.z=Math.max(-WORLD.z*1.3,Math.min(WORLD.z*1.3,camera.position.z));
+  }
+  if(entering)stepEnter(dt);
+  else if(+flash.style.opacity>0)flash.style.opacity=Math.max(0,+flash.style.opacity-dt*1.5);
+
+  camR.setFromMatrixColumn(camera.matrixWorld,0);
+  for(const m of meshes){
+    const u=m.userData;
+    m.position.addScaledVector(u.vel,dt);
+    if(Math.abs(m.position.x)>WORLD.x)u.vel.x*=-Math.sign(m.position.x*u.vel.x);
+    if(Math.abs(m.position.y)>WORLD.y)u.vel.y*=-Math.sign(m.position.y*u.vel.y);
+    if(Math.abs(m.position.z)>WORLD.z)u.vel.z*=-Math.sign(m.position.z*u.vel.z);
+    m.lookAt(camera.position);                      // face the visitor, then tilt
+    m.rotateY(u.tilt+Math.sin(t*u.k+u.ph)*.25);
+    m.rotateZ(u.roll*.5+Math.sin(t*u.k*.7+u.ph)*.08);
+    if(u.kind==="fish"||u.kind==="whale")u.flip=u.vel.dot(camR)>0?-1:1;
+    const s=u.base*(m===hover?1.12:1);
+    m.scale.set(s*u.flip,s,1);
+    m.material.color.setHex(m===hover?0xffee88:0xffffff);
+  }
+
+  // aim
+  if(active&&!entering){
+    ray.setFromCamera(locked?{x:0,y:0}:mouse,camera);
+    const hit=ray.intersectObjects(meshes,false)[0];
+    hover=hit&&hit.distance<70?hit.object:null;
+  }else hover=null;
+  $("cross").classList.toggle("on",!!hover);
+  if(toastT>0)toastT-=dt;
+  else if(hover){const e=hover.userData.entry;
+    $("label").innerHTML=e.title+"<small>"+(e.url?e.url.replace(/^https?:\/\//,""):"no address yet")+"</small>"}
+  else $("label").innerHTML="";
+
+  renderer.render(scene,camera);
+}
+addEventListener("resize",()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
+requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

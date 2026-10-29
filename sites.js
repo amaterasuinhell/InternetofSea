@@ -1,0 +1,28 @@
+// =====================================================================
+//  THE SEA OF LINKS: webmaster config
+// =====================================================================
+//  One line per window:   ["Title", "https://address", "image", "shape"]
+//
+//   - Title  : text shown on the window and when you aim at it
+//   - address: where the visitor lands. Leave "" for a placeholder.
+//   - image  : optional picture shown inside the window, e.g. "images/mysite.png"
+//              (put the file next to index.html). Leave "" for the generated look.
+//   - shape  : optional. One of: rect round oval hex fish tall wide whale
+//              Leave "" and the shape is picked randomly (and stays the same).
+//
+//  The sea always holds 100 windows. If you list fewer than 100 here, the
+//  rest are filled with placeholders. Just add lines to replace them.
+// =====================================================================
+
+const NEW_TAB = false;   // true = open sites in a new tab instead of leaving the sea
+
+const SITES = [
+  ["Example",        "https://example.com",              "", ""],
+  ["Wikipedia",      "https://www.wikipedia.org",        "", "round"],
+  ["Internet Archive","https://archive.org",             "", "tall"],
+  ["Cowboy Bebop",   "https://en.wikipedia.org/wiki/Cowboy_Bebop", "", "fish"],
+  ["Hacker News",    "https://news.ycombinator.com",     "", "wide"],
+  ["Big Whale",      "https://www.anthropic.com",        "", "whale"],
+  // ["My site 7",   "https://...", "images/site7.png", ""],
+  // ... add up to 100 lines
+];
