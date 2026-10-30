@@ -39,6 +39,8 @@ const SITES = [
   ["Neal Fun",   "https://neal.fun/", "", ""],
   ["Scream into the void",   "https://screamintothevoid.com/", "", ""],
    ["Bored",   "https://www.bored.com/", "", ""],
+  ["Voth",   "https://www.voth000.fi/", "", ""],
+ 
   
   
   
