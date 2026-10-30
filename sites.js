@@ -129,6 +129,25 @@ const SITES = [
   ["Robby Leonardi",         "https://www.rleonardi.com/interactive-resume/", "", ""], // memory: side-scrolling interactive résumé
   ["WebGL Fluid Simulation", "https://paveldogreat.github.io/WebGL-Fluid-Simulation/", "", ""], // memory: play with colorful fluid
   ["Pointer Pointer",        "https://pointerpointer.com/", "", ""],               // memory
+
+   // --- Dreamy / low-poly worlds you can walk around (itch.io; most play in the browser, some are downloads) ---
+  ["Surreal low-poly worlds",     "https://itch.io/games/free/tag-low-poly/tag-surreal", "", ""],               // found: listing, many "play in browser"
+  ["Walking simulators",          "https://itch.io/games/free/tag-exploration/tag-walking-simulator", "", ""],  // found: listing
+  ["Dreamcore low-poly",          "https://itch.io/games/tag-dreamcore/tag-low-poly", "", ""],                  // found: small, calm walking worlds
+  ["Hypnagogia 催眠術",             "https://sodaraptor.itch.io/hypnagogia", "", ""],                              // found: PS1-style dream worlds (download, not browser)
+
+  // --- Cowboy Bebop and anime-web nostalgia ---
+  ["Emily’s Cowboy Bebop Page",   "http://www.niko-niko.net/bebop/", "", ""],                                   // found: fansite from 1999, may be gone
+  ["Bebop web poster",            "https://qui.gg/work/bebop", "", ""],                                         // found: a one-page site in the show’s style
+
+  // --- Neocities: Japanese and Korean Y2K web, cyworld, kawaii, old-web ---
+  ["Neocities Y2K",               "https://neocities.org/browse?tag=y2k", "", ""],                              // found: browse page
+  ["ICHINISANHAI",                "https://ichinisanhai.neocities.org/", "", ""],                               // inferred: y2k fish and rainbows
+  ["The Muyuverse",               "https://uyumuyu.neocities.org/", "", ""],                                    // inferred: art, anime, cyworld
+  ["Hypnotize",                   "https://amivicky.neocities.org/", "", ""],                                   // inferred: kawaii 2000s web
+  ["peonyvalley",                 "https://pionilaakso.neocities.org/", "", ""],                                // inferred: webcore, old web
+  ["TEH RAVEYARD",                "https://butt0n-z.neocities.org/", "", ""],                                   // inferred: art, anime, games
+  ["MelonLand",                   "https://melonland.net/", "", ""],                                            // memory: weird-web community
   
   // ... add up to 100 lines
 ];
