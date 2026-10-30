@@ -170,7 +170,7 @@ const SIGNS = [
 //    fps    : frames per second of the loop (default 3)       pixel: true keeps pixel art sharp
 // ---------------------------------------------------------------------
 const SPRITES = [
-   { frames: ["images/stickers/640x427-Whale-Humpback-markedDW.png", "images/stickers/640x427-Whale-Humpback-markedDW.png"],
+   { frames: ["images/stickers/640x427-Whale-Humpback-markedDW.png", "images/stickers/640x427-Whale-Humpback-markedDW2.png"],
     count: 4, size: 14, speed: 1, faces: "left", motion: "steady" },
 
  
