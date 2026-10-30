@@ -49,6 +49,13 @@ while(list.length<COUNT) list.push({title:"Placeholder "+String(list.length+1).p
 const ASPECT={rect:1.4,round:1.25,oval:1.7,hex:1.1,fish:1.9,tall:.5,wide:3,whale:2.2};
 const KINDS=["rect","rect","round","round","oval","hex","fish","fish","tall","wide","wide","whale"];
 
+// name of the banner downloaded by fetch_banners.py (must match slug() there)
+function autoImage(url){
+  if(!url)return"";
+  try{const u=new URL(url);
+    const s=(u.hostname.replace(/^www\./,"")+u.pathname).toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"").slice(0,60);
+    return s?"images/"+s+".webp":"";}catch(_){return""}
+}
 function rng(seed){return()=>{seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
 
 // ---------- scene ----------
@@ -122,8 +129,9 @@ list.forEach((e,i)=>{
   const canvas=document.createElement("canvas");canvas.width=cw;canvas.height=ch;
   paint(canvas,e,i,kind,null);
   const tex=new THREE.CanvasTexture(canvas);tex.minFilter=tex.magFilter=THREE.NearestFilter;
-  if(e.image){const im=new Image();im.onload=()=>{paint(canvas,e,i,kind,im);tex.needsUpdate=true};
-    im.onerror=()=>console.warn("Image not found:",e.image);im.src=e.image}
+  const src=e.image||autoImage(e.url);          // manual image wins, else the downloaded banner
+  if(src){const im=new Image();im.onload=()=>{paint(canvas,e,i,kind,im);tex.needsUpdate=true};
+    if(e.image)im.onerror=()=>console.warn("Image not found:",e.image);im.src=src}
   const mesh=new THREE.Mesh(new THREE.PlaneGeometry(wid,hgt),
     new THREE.MeshBasicMaterial({map:tex,transparent:true,alphaTest:.1,side:THREE.DoubleSide}));
   let p;do{p=new THREE.Vector3((R()-.5)*2*WORLD.x,(R()-.5)*2*WORLD.y,(R()-.5)*2*WORLD.z)}while(p.distanceTo(START)<14);
@@ -137,7 +145,7 @@ list.forEach((e,i)=>{
 // ---------- swimmers (decoration only: smaller than windows, not clickable) ----------
 const SWIMMERS=40;
 const VARS=[{k:"octopus",c:"#e8337f"},{k:"octopus",c:"#8a3dd8"},{k:"squid",c:"#ff7a2e"},
-  {k:"jelly",c:"#b46cff"},{k:"jelly",c:"#35d0e0"},{k:"fish",c:"#ff9a2e"},{k:"fish",c:"#47e08a"},{k:"puffer",c:"#ffd23f"}];
+  {k:"jelly",c:"#b46cff"},{k:"jelly",c:"#35d0e0"},{k:"fish",c:"#ff9a2e"},{k:"fish",c:"#47e08a"}];
 function critterTex(v,f){
   const cv=document.createElement("canvas");cv.width=cv.height=128;
   const c=cv.getContext("2d"),col=v.c,sg=f?1:-1;
@@ -147,8 +155,6 @@ function critterTex(v,f){
     L.forEach(([x0,y0,x1,y1,a],i)=>{const q=a*sg*(i%2?1:-1);c.beginPath();c.moveTo(x0,y0);
       c.bezierCurveTo(x0+q,y0+(y1-y0)/3,x1-q,y0+2*(y1-y0)/3,x1,y1);c.stroke()})})};
   const eye=(x,y)=>{c.fillStyle="#fff";c.fillRect(x-4,y-4,8,8);c.fillStyle="#102";c.fillRect(x-1,y-1,3,3)};
-  const line=(pts,w1,w2)=>{[["#fff",w1],[col,w2]].forEach(([s,w])=>{c.strokeStyle=s;c.lineWidth=w;c.beginPath();
-  pts.forEach(([x,y],i)=>i?c.lineTo(x,y):c.moveTo(x,y));c.stroke()})};
   if(v.k==="octopus"){
     legs([0,1,2,3,4,5].map(i=>[44+i*8,66,18+i*18.5,118,12]));
     c.beginPath();c.ellipse(64,44,26,29,0,0,7);fill();eye(54,42);eye(74,42);
@@ -159,13 +165,6 @@ function critterTex(v,f){
   }else if(v.k==="jelly"){
     legs([0,1,2,3,4].map(i=>[34+i*15,56,30+i*17,122,9]));
     c.beginPath();c.arc(64,56,36,Math.PI,0);c.closePath();fill();eye(52,44);eye(76,44);
-  }else if(v.k==="puffer"){
-    const len=f?48:40;
-  for(let i=0;i<12;i++){const a=i/12*Math.PI*2,x=64+Math.cos(a)*30,y=64+Math.sin(a)*30;
-    line([[x,y],[64+Math.cos(a)*len,64+Math.sin(a)*len]],8,3);}                      // spikes first, body covers their roots
-  c.beginPath();c.moveTo(94,64);c.lineTo(114,50);c.lineTo(114,78);c.closePath();fill();   // small tail
-  c.beginPath();c.arc(64,64,31,0,7);fill();eye(50,56);
-  c.fillStyle="#102";c.fillRect(34,70,8,3);
   }else{
     const ty=f?8:-8;
     c.beginPath();c.moveTo(86,64);c.lineTo(118,40+ty);c.lineTo(118,88+ty);c.closePath();fill();
@@ -177,7 +176,7 @@ const critTex=VARS.map(v=>[0,1].map(f=>critterTex(v,f)));
 const crit=[],C=rng(99);
 for(let i=0;i<SWIMMERS;i++){
   const vi=Math.floor(C()*VARS.length),k=VARS[vi].k;
-  const sz=(k==="fish"||k==="puffer")?1.3+C()*1.1:k==="octopus"?2.2+C()*1.3:1.8+C()*1.4;   // windows are 3.5+ tall
+  const sz=k==="fish"?1.3+C()*1.1:k==="octopus"?2.2+C()*1.3:1.8+C()*1.4;   // windows are 3.5+ tall
   const s=new THREE.Sprite(new THREE.SpriteMaterial({map:critTex[vi][0],alphaTest:.1}));
   s.scale.set(sz,sz,1);
   s.position.set((C()-.5)*2*WORLD.x,(C()-.5)*2*WORLD.y,(C()-.5)*2*WORLD.z);
@@ -284,7 +283,7 @@ function frame(now){
 
   // swimmers: pulse, surge, wander (never hit by the aim ray)
   for(const s of crit){
-    const u=s.userData,cyc=Math.sin(t*u.rate+u.ph),fish=u.k==="fish"||u.k==="puffer";
+    const u=s.userData,cyc=Math.sin(t*u.rate+u.ph),fish=u.k==="fish";
     s.position.addScaledVector(u.dir,u.sp*(fish?1:.3+.7*Math.max(0,cyc))*dt);
     u.dir.applyAxisAngle(up,dt*.5*Math.sin(t*.2+u.ph));
     if(Math.abs(s.position.x)>WORLD.x*1.1)u.dir.x*=-Math.sign(s.position.x*u.dir.x);
