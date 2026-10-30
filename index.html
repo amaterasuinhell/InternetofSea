@@ -198,16 +198,17 @@ const signMeshes=[],SR=rng(21);
 const SWIMMERS=40;
 const VARS=[{k:"octopus",c:"#e8337f"},{k:"octopus",c:"#8a3dd8"},{k:"squid",c:"#ff7a2e"},
   {k:"jelly",c:"#b46cff"},{k:"jelly",c:"#35d0e0"},{k:"whale",c:"#4fa3ff",w:.5},{k:"shark",c:"#9db0e0",w:.5},{k:"fish",c:"#ff9a2e"},{k:"fish",c:"#47e08a"}];
+const OUTLINE=3;   // white outline thickness of the swimmers (was 5). Try 2 for very thin, 0 for none
 function critterTex(v,f){
   const cv=document.createElement("canvas");cv.width=cv.height=128;
   const c=cv.getContext("2d"),col=v.c,sg=f?1:-1;
   c.lineCap=c.lineJoin="round";
-  const fill=()=>{c.fillStyle=col;c.fill();c.strokeStyle="#fff";c.lineWidth=5;c.stroke()};
-  const legs=L=>{[["#fff",15],[col,8]].forEach(([s,w])=>{c.strokeStyle=s;c.lineWidth=w;
+  const fill=()=>{c.fillStyle=col;c.fill();if(OUTLINE>0){c.strokeStyle="#fff";c.lineWidth=OUTLINE;c.stroke()}};
+  const legs=L=>{[["#fff",8+OUTLINE*1.4],[col,8]].forEach(([s,w])=>{if(OUTLINE<=0&&s==="#fff")return;c.strokeStyle=s;c.lineWidth=w;
     L.forEach(([x0,y0,x1,y1,a],i)=>{const q=a*sg*(i%2?1:-1);c.beginPath();c.moveTo(x0,y0);
       c.bezierCurveTo(x0+q,y0+(y1-y0)/3,x1-q,y0+2*(y1-y0)/3,x1,y1);c.stroke()})})};
   const eye=(x,y)=>{c.fillStyle="#fff";c.fillRect(x-4,y-4,8,8);c.fillStyle="#102";c.fillRect(x-1,y-1,3,3)};
-  const line=(p,w1,w2)=>{[["#fff",w1],[col,w2]].forEach(([s,w])=>{c.strokeStyle=s;c.lineWidth=w;c.beginPath();p.forEach(([x,y],i)=>i?c.lineTo(x,y):c.moveTo(x,y));c.stroke()})};
+  const line=(p,w1,w2)=>{[["#fff",w2+OUTLINE*1.4],[col,w2]].forEach(([s,w])=>{if(OUTLINE<=0&&s==="#fff")return;c.strokeStyle=s;c.lineWidth=w;c.beginPath();p.forEach(([x,y],i)=>i?c.lineTo(x,y):c.moveTo(x,y));c.stroke()})};
   if(v.k==="octopus"){
     legs([0,1,2,3,4,5].map(i=>[44+i*8,66,18+i*18.5,118,12]));
     c.beginPath();c.ellipse(64,44,26,29,0,0,7);fill();eye(54,42);eye(74,42);
@@ -257,6 +258,26 @@ for(let i=0;i<SWIMMERS;i++){
     dir:new THREE.Vector3(Math.cos(a),(C()-.5)*.5,Math.sin(a)).normalize()};
   scene.add(s);crit.push(s);
 }
+
+// ---------- picture swimmers: your own sprite images (see SPRITES in sites.js) ----------
+const picCrit=[];
+(typeof SPRITES!=="undefined"?SPRITES:[]).forEach((sp,si)=>{
+  const info={aspect:1,ready:false},R2=rng(300+si);
+  const tex=(sp.frames||[]).map((f,i)=>{
+    const t=new THREE.TextureLoader().load(f,tx=>{if(i===0){info.aspect=tx.image.width/tx.image.height;info.ready=true}},undefined,
+      ()=>console.warn("Swimmer image not found:",f));
+    t.minFilter=THREE.LinearFilter;if(sp.pixel)t.magFilter=THREE.NearestFilter;return t;});
+  if(!tex.length)return;
+  for(let i=0;i<(sp.count||1);i++){
+    const s=new THREE.Sprite(new THREE.SpriteMaterial({map:tex[0],alphaTest:.05}));
+    s.visible=false;
+    s.position.set((R2()-.5)*2*WORLD.x,(R2()-.5)*2*WORLD.y,(R2()-.5)*2*WORLD.z);
+    const a=R2()*6.28;
+    s.userData={sp,info,tex,h:(sp.size||2.5)*(.9+R2()*.2),ph:R2()*6.28,rate:2+R2()*1.5,speed:(sp.speed||2)*(.8+R2()*.4),
+      pulse:sp.motion==="pulse",frame:0,flip:1,dir:new THREE.Vector3(Math.cos(a),(R2()-.5)*.5,Math.sin(a)).normalize()};
+    scene.add(s);picCrit.push(s);
+  }
+});
 
 // ---------- controls ----------
 let yaw=0,pitch=0,active=false,locked=false,entering=null,drag=null,hover=null;
@@ -373,6 +394,20 @@ function frame(now){
     if(fish)u.flip=u.dir.dot(camR)>0?-1:1;
     const sq=fish?0:cyc*.1;
     s.scale.set(u.sz*(1-sq)*u.flip,u.sz*(1+sq),1);
+  }
+
+  for(const s of picCrit){                         // picture swimmers (your own sprites)
+    const u=s.userData,sp=u.sp;s.visible=u.info.ready;if(!u.info.ready)continue;
+    const cyc=Math.sin(t*u.rate+u.ph);
+    s.position.addScaledVector(u.dir,u.speed*(u.pulse?.3+.7*Math.max(0,cyc):1)*dt);
+    u.dir.applyAxisAngle(up,dt*.5*Math.sin(t*.2+u.ph));
+    if(Math.abs(s.position.x)>WORLD.x*1.1)u.dir.x*=-Math.sign(s.position.x*u.dir.x);
+    if(Math.abs(s.position.y)>WORLD.y*1.1)u.dir.y*=-Math.sign(s.position.y*u.dir.y);
+    if(Math.abs(s.position.z)>WORLD.z*1.1)u.dir.z*=-Math.sign(s.position.z*u.dir.z);
+    if(u.tex.length>1){const f=Math.floor(t*(sp.fps||3)+u.ph)%u.tex.length;if(f!==u.frame){u.frame=f;s.material.map=u.tex[f]}}
+    if(sp.faces==="left"||sp.faces==="right"){const right=u.dir.dot(camR)>0;u.flip=(right===(sp.faces==="left"))?-1:1}
+    const sq=u.pulse?cyc*.1:0;
+    s.scale.set(u.h*u.info.aspect*(1-sq)*u.flip,u.h*(1+sq),1);
   }
 
   // aim
