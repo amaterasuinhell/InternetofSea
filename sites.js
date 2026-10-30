@@ -31,6 +31,15 @@ const SITES = [
   ["Reddit",   "https://reddit.com/", "", ""],
 ["Should see this",   "https://shouldseethis.com/", "", ""],
   ["The useless web",   "https://theuselessweb.com/", "", ""],
+   ["Kleki",   "https://kleki.com/", "", ""],
+   ["The Louvre virtual tour",   "https://www.louvre.fr/en/online-tours", "", ""],
+   ["National Museum of Modern and Contemporary Art, Korea",   "https://www.mmca.go.kr/eng/digitals/digitalMain.do", "", ""],
+   ["Online Exhibitions - Smithsonian Institution",   "https://www.si.edu/exhibitions/online", "", ""],
+  ["Why Building Weird Projects Makes You a Better Developer",   "https://www.howtogeek.com/why-i-keep-starting-weird-projects-i-dont-actually-need/", "", ""],
+  ["Neal Fun",   "https://neal.fun/", "", ""],
+  ["Scream into the void",   "https://screamintothevoid.com/", "", ""],
+   ["Bored",   "https://www.bored.com/", "", ""],
+  
   
   
   // ... add up to 100 lines
