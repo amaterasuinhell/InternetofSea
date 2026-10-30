@@ -145,7 +145,7 @@ list.forEach((e,i)=>{
 // ---------- swimmers (decoration only: smaller than windows, not clickable) ----------
 const SWIMMERS=40;
 const VARS=[{k:"octopus",c:"#e8337f"},{k:"octopus",c:"#8a3dd8"},{k:"squid",c:"#ff7a2e"},
-  {k:"jelly",c:"#b46cff"},{k:"jelly",c:"#35d0e0"},{k:"fish",c:"#ff9a2e"},{k:"fish",c:"#47e08a"}];
+  {k:"jelly",c:"#b46cff"},{k:"jelly",c:"#35d0e0"},{k:"whale",c:"#4fa3ff",w:.5},{k:"shark",c:"#9db0e0",w:.5},{k:"fish",c:"#ff9a2e"},{k:"fish",c:"#47e08a"}];
 function critterTex(v,f){
   const cv=document.createElement("canvas");cv.width=cv.height=128;
   const c=cv.getContext("2d"),col=v.c,sg=f?1:-1;
@@ -165,6 +165,25 @@ function critterTex(v,f){
   }else if(v.k==="jelly"){
     legs([0,1,2,3,4].map(i=>[34+i*15,56,30+i*17,122,9]));
     c.beginPath();c.arc(64,56,36,Math.PI,0);c.closePath();fill();eye(52,44);eye(76,44);
+  }else if(v.k==="whale"){
+    const ty=f?6:-6;
+    c.beginPath();c.moveTo(92,62);c.lineTo(108,60+ty);c.lineTo(124,40+ty);c.lineTo(120,62+ty);c.lineTo(126,86+ty);c.lineTo(108,68+ty);c.lineTo(92,76);c.closePath();fill();   // tail
+    c.beginPath();c.moveTo(48,86);c.lineTo(36,110);c.lineTo(68,90);c.closePath();fill();       // flipper
+    c.beginPath();c.ellipse(56,68,46,26,0,0,7);fill();                                        // body
+    c.fillStyle="rgba(255,255,255,.28)";c.beginPath();c.ellipse(54,80,30,7,0,0,7);c.fill();    // pale belly
+    eye(26,62);
+    if(f){c.fillStyle="#fff";c.fillRect(56,28,4,10);c.fillRect(48,22,4,4);c.fillRect(64,22,4,4)}   // spout (frame 2 only)
+  }else if(v.k==="shark"){
+    const ty=f?6:-6;
+    c.beginPath();c.moveTo(98,64);c.lineTo(122,38+ty);c.lineTo(112,68);c.lineTo(118,96+ty);c.lineTo(98,72);c.closePath();fill();   // tail
+    c.beginPath();c.moveTo(54,50);c.lineTo(66,22);c.lineTo(80,52);c.closePath();fill();        // dorsal fin
+    c.beginPath();c.moveTo(44,78);c.lineTo(36,102);c.lineTo(62,80);c.closePath();fill();       // pectoral fin
+    c.beginPath();c.moveTo(8,68);c.quadraticCurveTo(30,44,70,50);c.quadraticCurveTo(92,54,104,64);
+    c.lineTo(104,72);c.quadraticCurveTo(80,84,50,82);c.quadraticCurveTo(22,80,8,68);c.closePath();fill();   // body
+    c.strokeStyle="#fff";c.lineWidth=2;
+    for(let i=0;i<3;i++){c.beginPath();c.moveTo(36+i*6,60);c.lineTo(34+i*6,68);c.stroke()}      // gills
+    c.beginPath();c.moveTo(10,70);c.lineTo(26,74);c.stroke();                                  // mouth
+    eye(22,62);
   }else{
     const ty=f?8:-8;
     c.beginPath();c.moveTo(86,64);c.lineTo(118,40+ty);c.lineTo(118,88+ty);c.closePath();fill();
@@ -175,13 +194,13 @@ function critterTex(v,f){
 const critTex=VARS.map(v=>[0,1].map(f=>critterTex(v,f)));
 const crit=[],C=rng(99);
 for(let i=0;i<SWIMMERS;i++){
-  const vi=Math.floor(C()*VARS.length),k=VARS[vi].k;
-  const sz=k==="fish"?1.3+C()*1.1:k==="octopus"?2.2+C()*1.3:1.8+C()*1.4;   // windows are 3.5+ tall
+  let vi;do{vi=Math.floor(C()*VARS.length)}while(C()>(VARS[vi].w||1));const k=VARS[vi].k;
+  const sz=k==="whale"?3+C()*1.2:k==="shark"?2.3+C()*1.0:k==="fish"?1.3+C()*1.1:k==="octopus"?2.2+C()*1.3:1.8+C()*1.4;   // windows are 3.5+ tall
   const s=new THREE.Sprite(new THREE.SpriteMaterial({map:critTex[vi][0],alphaTest:.1}));
   s.scale.set(sz,sz,1);
   s.position.set((C()-.5)*2*WORLD.x,(C()-.5)*2*WORLD.y,(C()-.5)*2*WORLD.z);
   const a=C()*6.28;
-  s.userData={vi,k,sz,ph:C()*6.28,rate:2+C()*1.5,sp:1.8+C()*2.6,frame:0,flip:1,
+  s.userData={vi,k,sz,ph:C()*6.28,rate:2+C()*1.5,sp:k==="whale"?.8+C()*.6:k==="shark"?3+C()*1.5:1.8+C()*2.6,frame:0,flip:1,
     dir:new THREE.Vector3(Math.cos(a),(C()-.5)*.5,Math.sin(a)).normalize()};
   scene.add(s);crit.push(s);
 }
@@ -283,7 +302,7 @@ function frame(now){
 
   // swimmers: pulse, surge, wander (never hit by the aim ray)
   for(const s of crit){
-    const u=s.userData,cyc=Math.sin(t*u.rate+u.ph),fish=u.k==="fish";
+    const u=s.userData,cyc=Math.sin(t*u.rate+u.ph),fish=u.k==="fish"||u.k==="whale"||u.k==="shark";
     s.position.addScaledVector(u.dir,u.sp*(fish?1:.3+.7*Math.max(0,cyc))*dt);
     u.dir.applyAxisAngle(up,dt*.5*Math.sin(t*.2+u.ph));
     if(Math.abs(s.position.x)>WORLD.x*1.1)u.dir.x*=-Math.sign(s.position.x*u.dir.x);
