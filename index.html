@@ -142,6 +142,58 @@ list.forEach((e,i)=>{
   scene.add(mesh);meshes.push(mesh);
 });
 
+// ---------- signs (decoration: your own text panels with stickers; not links) ----------
+const SIGN_PLACE={left:[0,.5],right:[1,.5],top:[.5,0],bottom:[.5,1],topleft:[0,0],topright:[1,0],bottomleft:[0,1],bottomright:[1,1],center:[.5,.5]};
+const IMG_RE=/\.(png|jpe?g|gif|webp|svg)$/i;
+function wrapText(c,t,maxW){
+  const out=[];let cur="";
+  for(const w of String(t).split(/\s+/)){const test=cur?cur+" "+w:w;
+    if(c.measureText(test).width>maxW&&cur){out.push(cur);cur=w}else cur=test}
+  if(cur)out.push(cur);return out;
+}
+function paintSign(cv,s,imgs){
+  const c=cv.getContext("2d"),W=cv.width,H=cv.height,mx=32,my=24,pw=W-2*mx,ph=H-2*my,st=s.stickers||[];
+  c.clearRect(0,0,W,H);c.lineJoin="round";
+  c.save();c.translate(mx,my);path(c,s.shape||"round",pw,ph);                       // the panel
+  c.fillStyle=s.bg||"#e8337f";c.fill();c.strokeStyle=s.outline||"#fff";c.lineWidth=5;c.stroke();c.restore();
+  const padL=st.some(x=>x[1]==="left")?46:0,padR=st.some(x=>x[1]==="right")?46:0;     // leave room beside side stickers
+  const maxW=pw-44-padL-padR,maxH=ph-34;
+  c.fillStyle=s.color||"#fff";c.textAlign="center";c.textBaseline="middle";
+  let size=52,lines=[];
+  for(;size>=16;size-=3){c.font='bold '+size+'px "Courier New",monospace';lines=wrapText(c,s.text||"",maxW);
+    if(lines.length*size*1.18<=maxH)break}                                              // shrink until the text fits
+  const cx=mx+pw/2+(padL-padR)/2,y0=my+ph/2-(lines.length-1)*size*1.18/2;
+  lines.forEach((l,i)=>c.fillText(l,cx,y0+i*size*1.18));
+  st.forEach(([sticker,place],i)=>{                                                      // stickers sit on the panel edge
+    const [fx,fy]=SIGN_PLACE[place]||SIGN_PLACE.center,img=imgs[i];
+    const x=mx+pw*fx+(fx===0?12:fx===1?-12:0),y=my+ph*fy+(fy===0?10:fy===1?-10:0);
+    c.save();c.translate(x,y);c.rotate(i%2?.18:-.16);c.shadowColor="#fff";c.shadowBlur=5;
+    for(let k=0;k<3;k++){                                                                // 3 passes make the white sticker border solid
+      if(img){if(img.complete&&img.naturalWidth){const k2=76/Math.max(img.naturalWidth,img.naturalHeight);
+        c.drawImage(img,-img.naturalWidth*k2/2,-img.naturalHeight*k2/2,img.naturalWidth*k2,img.naturalHeight*k2)}}
+      else{c.font='60px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif';c.fillText(sticker,0,4)}
+    }
+    c.restore();
+  });
+}
+const signMeshes=[],SR=rng(21);
+(typeof SIGNS!=="undefined"?SIGNS:[]).forEach(s=>{
+  const cv=document.createElement("canvas");cv.width=448;cv.height=208;
+  const tex=new THREE.CanvasTexture(cv);tex.minFilter=THREE.LinearFilter;             // smooth, so text stays readable
+  const imgs=(s.stickers||[]).map(([sticker])=>{
+    if(!IMG_RE.test(sticker))return null;
+    const im=new Image();im.onload=()=>{paintSign(cv,s,imgs);tex.needsUpdate=true};
+    im.onerror=()=>console.warn("Sticker not found:",sticker);im.src=sticker;return im;});
+  paintSign(cv,s,imgs);
+  const h=s.size||4.6,mesh=new THREE.Mesh(new THREE.PlaneGeometry(h*448/208,h),
+    new THREE.MeshBasicMaterial({map:tex,transparent:true,alphaTest:.05,side:THREE.DoubleSide}));
+  let p;do{p=new THREE.Vector3((SR()-.5)*2*WORLD.x,(SR()-.5)*2*WORLD.y,(SR()-.5)*2*WORLD.z)}while(p.distanceTo(START)<14);
+  mesh.position.copy(p);
+  mesh.userData={vel:new THREE.Vector3(SR()-.5,(SR()-.5)*.2,SR()-.5).normalize().multiplyScalar(.3+SR()*.5),
+    tilt:(SR()-.5)*.9,roll:(SR()-.5)*.3,ph:SR()*6.28,k:.3+SR()*.4};
+  scene.add(mesh);signMeshes.push(mesh);
+});
+
 // ---------- swimmers (decoration only: smaller than windows, not clickable) ----------
 const SWIMMERS=40;
 const VARS=[{k:"octopus",c:"#e8337f"},{k:"octopus",c:"#8a3dd8"},{k:"squid",c:"#ff7a2e"},
@@ -301,6 +353,13 @@ function frame(now){
     m.material.color.setHex(m===hover?0xffee88:0xffffff);
   }
 
+  for(const m of signMeshes){                      // signs drift, face you, never clickable
+    const u=m.userData;m.position.addScaledVector(u.vel,dt);
+    if(Math.abs(m.position.x)>WORLD.x)u.vel.x*=-Math.sign(m.position.x*u.vel.x);
+    if(Math.abs(m.position.y)>WORLD.y)u.vel.y*=-Math.sign(m.position.y*u.vel.y);
+    if(Math.abs(m.position.z)>WORLD.z)u.vel.z*=-Math.sign(m.position.z*u.vel.z);
+    m.lookAt(camera.position);m.rotateY(u.tilt+Math.sin(t*u.k+u.ph)*.2);m.rotateZ(u.roll+Math.sin(t*u.k*.7+u.ph)*.05);
+  }
   // swimmers: pulse, surge, wander (never hit by the aim ray)
   for(const s of crit){
     const u=s.userData,cyc=Math.sin(t*u.rate+u.ph),fish=u.k==="fish"||u.k==="whale"||u.k==="shark";
