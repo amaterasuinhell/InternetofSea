@@ -28,6 +28,10 @@ const SITES = [
   ["Pictoplasma",   "https://pictoplasma.com/", "", ""],
   ["We Got No Taste",   "https://wegotnotaste.com/", "", ""],
   ["Level 80",   "https://80.lv/", "", ""],
+  ["Reddit",   "https://reddit.com/", "", ""],
+["Should see this",   "https://shouldseethis.com/", "", ""],
+  ["The useless web",   "https://theuselessweb.com/", "", ""],
+  
   
   // ... add up to 100 lines
 ];
