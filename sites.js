@@ -22,7 +22,12 @@ const SITES = [
   ["Internet Archive","https://archive.org",             "", "tall"],
   ["Cowboy Bebop",   "https://en.wikipedia.org/wiki/Cowboy_Bebop", "", "fish"],
   ["Hacker News",    "https://news.ycombinator.com",     "", "wide"],
-  ["Big Whale",      "https://www.anthropic.com",        "", "whale"],
-  // ["My site 7",   "https://...", "images/site7.png", ""],
+  ["Big Whale",      "https://www.anthropic.com",        "", "tall"],
+  ["Felix Rieseberg",   "https://felixrieseberg.com/", "", "round"],
+  ["TAMK",   "https://tamk.fi", "", ""],
+  ["Pictoplasma",   "https://pictoplasma.com/", "", ""],
+  ["We Got No Taste",   "https://wegotnotaste.com/", "", ""],
+  ["Level 80",   "https://80.lv/", "", ""],
+  
   // ... add up to 100 lines
 ];
