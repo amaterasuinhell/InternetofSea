@@ -41,6 +41,11 @@ const SITES = [
    ["Bored",   "https://www.bored.com/", "", ""],
   ["Voth",   "https://www.voth000.fi/", "", ""],
 ["Jestr",   "https://www.jestr.gg/", "", ""],
+["nit_alcove",   "https://www.nitalcove.com/", "", ""],
+["Radii",   "https://radii.co/", "", ""],
+ 
+
+ 
  
    // --- Niche web development and creative coding ---
   ["Bruno Simon",          "https://bruno-simon.com/", "", ""],
