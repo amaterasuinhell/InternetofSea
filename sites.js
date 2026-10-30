@@ -110,7 +110,25 @@ const SITES = [
   ["Brian Mackern",              "https://netart.org.uy/brian.html", "", ""],                        // found
   ["ICAA Documents archive",     "https://icaadocs.mfah.org/", "", ""],                              // memory
   
-  
+    // --- 3D worlds and walkable experiences ---
+  ["Deep Sea (Neal.fun)",    "https://neal.fun/deep-sea/", "", "tall"],            // memory: scroll down through the ocean
+  ["Slow Roads",             "https://slowroads.io/", "", ""],                     // memory: calm endless driving
+  ["NASA Eyes",              "https://eyes.nasa.gov/", "", ""],                    // memory: fly around the solar system
+  ["Stellarium Web",         "https://stellarium-web.org/", "", ""],               // memory: the night sky
+  ["Lusion",                 "https://lusion.co/", "", ""],                        // memory: 3D studio site you explore
+  ["Abeto",                  "https://abeto.co/", "", ""],                         // memory: dreamy 3D studio world
+  ["Active Theory",          "https://activetheory.net/", "", ""],                 // memory
+  ["mesh3d gallery",         "https://mesh3d.gallery/", "", ""],                   // found: curated list of 3D web experiences
+
+  // --- 2D places to wander and play ---
+  ["Zoomquilt",              "https://zoomquilt.org/", "", ""],                    // found: endless zoom painting
+  ["Poolside FM",            "https://poolside.fm/", "", ""],                      // memory: retro sunny music world
+  ["This Is Sand",           "https://thisissand.com/", "", ""],                   // memory: draw with falling sand
+  ["Infinite Mac",           "https://infinitemac.org/", "", ""],                  // memory: classic Mac desktops in your browser
+  ["WindowSwap",             "https://www.window-swap.com/", "", ""],              // memory: look out other people’s windows
+  ["Robby Leonardi",         "https://www.rleonardi.com/interactive-resume/", "", ""], // memory: side-scrolling interactive résumé
+  ["WebGL Fluid Simulation", "https://paveldogreat.github.io/WebGL-Fluid-Simulation/", "", ""], // memory: play with colorful fluid
+  ["Pointer Pointer",        "https://pointerpointer.com/", "", ""],               // memory
   
   // ... add up to 100 lines
 ];
