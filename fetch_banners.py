@@ -64,7 +64,7 @@ class Head(HTMLParser):
     def handle_starttag(self, tag, attrs):
         d = {k: (v or "") for k, v in attrs}
         if tag == "meta":
-            key = (d.get("property") or d.get("name")).lower()
+            key = (d.get("property") or d.get("name") or "").lower()
             if key and d.get("content"):
                 self.meta.setdefault(key, d["content"])
         elif tag == "link" and "icon" in d.get("rel", "").lower() and d.get("href"):
