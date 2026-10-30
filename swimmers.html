@@ -93,6 +93,26 @@ puffer:{isNew:1,color:"#ffd23f",note:"A round fish with spikes. The spikes grow 
   c.beginPath();c.moveTo(94,64);c.lineTo(114,50);c.lineTo(114,78);c.closePath();fill();   // small tail
   c.beginPath();c.arc(64,64,31,0,7);fill();eye(50,56);
   c.fillStyle="#102";c.fillRect(34,70,8,3);}}                                           // mouth
+,
+whale:{isNew:1,color:"#4fa3ff",note:"A big round body with a pale belly. The tail rises and falls, and a water spout appears in frame 2. Faces left like the fish.",
+ draw(g){const {c,f,fill,eye}=g;const ty=f?6:-6;
+  c.beginPath();c.moveTo(92,62);c.lineTo(108,60+ty);c.lineTo(124,40+ty);c.lineTo(120,62+ty);c.lineTo(126,86+ty);c.lineTo(108,68+ty);c.lineTo(92,76);c.closePath();fill();   // tail
+  c.beginPath();c.moveTo(48,86);c.lineTo(36,110);c.lineTo(68,90);c.closePath();fill();       // flipper
+  c.beginPath();c.ellipse(56,68,46,26,0,0,7);fill();                                        // body
+  c.fillStyle="rgba(255,255,255,.28)";c.beginPath();c.ellipse(54,80,30,7,0,0,7);c.fill();    // pale belly
+  eye(26,62);
+  if(f){c.fillStyle="#fff";c.fillRect(56,28,4,10);c.fillRect(48,22,4,4);c.fillRect(64,22,4,4)}}},   // spout
+shark:{isNew:1,color:"#9db0e0",note:"A streamlined body with a dorsal fin, gills and a mouth line. The tail sweeps up and down. In the sea it swims faster than the others.",
+ draw(g){const {c,f,fill,eye}=g;const ty=f?6:-6;
+  c.beginPath();c.moveTo(98,64);c.lineTo(122,38+ty);c.lineTo(112,68);c.lineTo(118,96+ty);c.lineTo(98,72);c.closePath();fill();   // tail
+  c.beginPath();c.moveTo(54,50);c.lineTo(66,22);c.lineTo(80,52);c.closePath();fill();        // dorsal fin
+  c.beginPath();c.moveTo(44,78);c.lineTo(36,102);c.lineTo(62,80);c.closePath();fill();       // pectoral fin
+  c.beginPath();c.moveTo(8,68);c.quadraticCurveTo(30,44,70,50);c.quadraticCurveTo(92,54,104,64);
+  c.lineTo(104,72);c.quadraticCurveTo(80,84,50,82);c.quadraticCurveTo(22,80,8,68);c.closePath();fill();   // body
+  c.strokeStyle="#fff";c.lineWidth=2;
+  for(let i=0;i<3;i++){c.beginPath();c.moveTo(36+i*6,60);c.lineTo(34+i*6,68);c.stroke()}      // gills
+  c.beginPath();c.moveTo(10,70);c.lineTo(26,74);c.stroke();                                  // mouth
+  eye(22,62);}}
 };
 
 // ---- build the page ----
