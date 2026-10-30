@@ -81,3 +81,9 @@ const SITES = [
   
   // ... add up to 100 lines
 ];
+const SIGNS = [
+  { text: "Have a nice swim", color: "#ffffff", bg: "#e8337f", stickers: [["🐟", "left"], ["⭐", "topright"]] },
+  { text: "Don’t get lost",   color: "#102060", bg: "#ffe14a", shape: "rect", stickers: [["🧭", "right"]] },
+  { text: "Mind the sharks",  color: "#ffffff", bg: "#0b7a5c", stickers: [["🦈", "bottomleft"]] },
+];
+
