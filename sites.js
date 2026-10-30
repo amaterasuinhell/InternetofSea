@@ -40,6 +40,8 @@ const SITES = [
   ["Scream into the void",   "https://screamintothevoid.com/", "", ""],
    ["Bored",   "https://www.bored.com/", "", ""],
   ["Voth",   "https://www.voth000.fi/", "", ""],
+["Jestr",   "https://www.jestr.gg/", "", ""],
+ 
    // --- Niche web development and creative coding ---
   ["Bruno Simon",          "https://bruno-simon.com/", "", ""],
   ["Neal.fun",             "https://neal.fun/", "", ""],
