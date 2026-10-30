@@ -17,7 +17,7 @@
 const NEW_TAB = false;   // true = open sites in a new tab instead of leaving the sea
 
 const SITES = [
-  ["Example",        "https://example.com",              "", ""],
+ 
   ["Wikipedia",      "https://www.wikipedia.org",        "", "round"],
   ["Internet Archive","https://archive.org",             "", "tall"],
   ["Cowboy Bebop",   "https://en.wikipedia.org/wiki/Cowboy_Bebop", "", "fish"],
