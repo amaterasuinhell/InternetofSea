@@ -82,7 +82,33 @@ const SITES = [
   ["Hundred Rabbits",      "https://100r.co/", "", ""],
   ["PICO-8",               "https://www.lexaloffle.com/pico-8.php", "", ""],
   ["Increpare Games",      "https://www.increpare.com/", "", ""],
- 
+
+   // --- 土酷 / 土味 reading and Chinese internet art ---
+  ["Too Cool (aesthetics wiki)", "https://aesthetics.fandom.com/wiki/Too_Cool", "", ""],            // found
+  ["China Too Cool (Sabukaru)",  "https://sabukaru.online/articles/china-too-cool-where-sincerity-and-irony-meets-in-digital-nature", "", ""], // found
+  ["Tǔ wèi: the new ugly",       "https://musingpotato.substack.com/p/tu-wei-the-new-ugly", "", ""], // found
+  ["Miao Ying",                  "https://www.miaoyingstudio.com/", "", ""],                         // found
+  ["Chinternet Plus",            "https://archive.newmuseum.org/exhibitions/2524", "", ""],          // found
+  ["Hardcore Digital Detox",     "https://www.mplus.org.hk/en/exhibitions/hardcore-digital-detox-by-miao-ying/", "", ""], // found
+  ["Kuaishou",                   "https://www.kuaishou.com/", "", ""],                               // memory
+  ["hao123",                     "https://www.hao123.com/", "", ""],                                 // memory
+  ["2345",                       "https://www.2345.com/", "", ""],                                   // memory
+
+  // --- Japan: the cluttered web ---
+  ["Puzzle of Japanese web design", "https://zeldman.com/2010/07/25/the-puzzle-of-japanese-web-design", "", ""], // found
+  ["Rakuten Ichiba",             "https://www.rakuten.co.jp/", "", ""],                              // memory
+  ["Yahoo! Japan",               "https://www.yahoo.co.jp/", "", ""],                                // memory
+
+  // --- Africa ---
+  ["African Digital Art",        "https://africandigitalart.com/", "", ""],                          // found
+  ["Bubblegum Club archive",     "https://archive.bubblegumclub.co.za/", "", ""],                    // found
+  ["Chimurenga",                 "https://chimurenga.co.za/", "", ""],                               // memory
+  ["Contemporary And (C&)",      "https://contemporaryand.com/", "", ""],                            // memory
+
+  // --- South America ---
+  ["netart latino database",     "https://anthology.rhizome.org/netart-latino-database", "", ""],    // found
+  ["Brian Mackern",              "https://netart.org.uy/brian.html", "", ""],                        // found
+  ["ICAA Documents archive",     "https://icaadocs.mfah.org/", "", ""],                              // memory
   
   
   
