@@ -93,9 +93,9 @@ function path(c,kind,w,h){
     case"round":c.roundRect(m,m,w-2*m,h-2*m,Math.min(w,h)*.28);break;
     case"oval":c.ellipse(w/2,h/2,w/2-m,h/2-m,0,0,Math.PI*2);break;
     case"hex":{const k=w*.25;c.moveTo(k,m);c.lineTo(w-k,m);c.lineTo(w-m,h/2);c.lineTo(w-k,h-m);c.lineTo(k,h-m);c.lineTo(m,h/2);c.closePath();break}
-    case"fish":case"whale":
-      c.ellipse(w*.4,h/2,w*.4-m,h/2-m,0,0,Math.PI*2);
-      c.moveTo(w*.7,h/2);c.lineTo(w-m,m);c.lineTo(w-m,h-m);c.closePath();break;
+  //  case"fish":case"whale":
+   //    c.ellipse(w*.4,h/2,w*.4-m,h/2-m,0,0,Math.PI*2);
+  //     c.moveTo(w*.7,h/2);c.lineTo(w-m,m);c.lineTo(w-m,h-m);c.closePath();break;
     default:c.rect(m,m,w-2*m,h-2*m);
   }
 }
