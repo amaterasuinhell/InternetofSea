@@ -87,3 +87,19 @@ const SIGNS = [
   { text: "Mind the sharks",  color: "#ffffff", bg: "#0b7a5c", stickers: [["🦈", "bottomleft"]] },
 ];
 
+// ---------------------------------------------------------------------
+//  SPRITES: your own swimmer pictures (PNG or WebP with a transparent background).
+//  They swim together with the drawn swimmers. Not links, not clickable.
+//    frames : one image, or several that play in a loop (a little animation)
+//    count  : how many of them swim around
+//    size   : height in the sea (small fish ~1.5, octopus ~3, whale ~4)
+//    speed  : swimming speed (fish 2-4, whale ~1)
+//    faces  : which way the picture looks: "left" or "right". It flips when it swims
+//             the other way. "none" = never flips.
+//    motion : "steady" (like a fish) or "pulse" (surges then drifts, like a jellyfish)
+//    fps    : frames per second of the loop (default 3)       pixel: true keeps pixel art sharp
+// ---------------------------------------------------------------------
+const SPRITES = [
+  // { frames: ["images/swimmers/turtle1.png", "images/swimmers/turtle2.png"],
+  //   count: 3, size: 3, speed: 1.5, faces: "left", motion: "steady" },
+];
