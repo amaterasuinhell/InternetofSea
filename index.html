@@ -57,8 +57,17 @@ renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));
 renderer.setSize(innerWidth,innerHeight);
 document.body.prepend(renderer.domElement);
 const scene=new THREE.Scene();
-scene.background=new THREE.Color(0x0b16b8);
-scene.fog=new THREE.Fog(0x0b16b8,12,120);
+// sea colors: lighter above, darker below; distant things fade toward the deep blue
+const SEA_TOP=0x1b32d2, SEA_MID=0x0a1498, SEA_BOTTOM=0x030748, FOG=0x08117a;
+scene.background=new THREE.Color(SEA_MID);
+scene.fog=new THREE.Fog(FOG,12,115);
+const dome=new THREE.Mesh(new THREE.SphereGeometry(250,24,16),new THREE.ShaderMaterial({
+  side:THREE.BackSide,depthWrite:false,fog:false,
+  uniforms:{top:{value:new THREE.Color(SEA_TOP)},mid:{value:new THREE.Color(SEA_MID)},bot:{value:new THREE.Color(SEA_BOTTOM)}},
+  vertexShader:"varying vec3 d;void main(){d=normalize(position);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}",
+  fragmentShader:"uniform vec3 top,mid,bot;varying vec3 d;void main(){float h=d.y*.5+.5;"+
+    "vec3 c=mix(bot,mid,smoothstep(.12,.5,h));c=mix(c,top,smoothstep(.5,1.,h));gl_FragColor=vec4(c,1.);}"}));
+dome.renderOrder=-1;scene.add(dome);
 const camera=new THREE.PerspectiveCamera(70,innerWidth/innerHeight,.1,300);
 const START=new THREE.Vector3(0,0,62);
 camera.position.copy(START);
@@ -291,6 +300,7 @@ function frame(now){
     $("label").innerHTML=e.title+"<small>"+(e.url?e.url.replace(/^https?:\/\//,""):"no address yet")+"</small>"}
   else $("label").innerHTML="";
 
+  dome.position.copy(camera.position);
   renderer.render(scene,camera);
 }
 addEventListener("resize",()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
