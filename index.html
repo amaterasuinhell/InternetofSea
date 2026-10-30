@@ -137,7 +137,7 @@ list.forEach((e,i)=>{
 // ---------- swimmers (decoration only: smaller than windows, not clickable) ----------
 const SWIMMERS=40;
 const VARS=[{k:"octopus",c:"#e8337f"},{k:"octopus",c:"#8a3dd8"},{k:"squid",c:"#ff7a2e"},
-  {k:"jelly",c:"#b46cff"},{k:"jelly",c:"#35d0e0"},{k:"fish",c:"#ff9a2e"},{k:"fish",c:"#47e08a"}];
+  {k:"jelly",c:"#b46cff"},{k:"jelly",c:"#35d0e0"},{k:"fish",c:"#ff9a2e"},{k:"fish",c:"#47e08a"},{k:"puffer",c:"#47e08a"}];
 function critterTex(v,f){
   const cv=document.createElement("canvas");cv.width=cv.height=128;
   const c=cv.getContext("2d"),col=v.c,sg=f?1:-1;
@@ -157,6 +157,13 @@ function critterTex(v,f){
   }else if(v.k==="jelly"){
     legs([0,1,2,3,4].map(i=>[34+i*15,56,30+i*17,122,9]));
     c.beginPath();c.arc(64,56,36,Math.PI,0);c.closePath();fill();eye(52,44);eye(76,44);
+  }else if(v.k==="puffer"){
+    const len=f?48:40;
+  for(let i=0;i<12;i++){const a=i/12*Math.PI*2,x=64+Math.cos(a)*30,y=64+Math.sin(a)*30;
+    line([[x,y],[64+Math.cos(a)*len,64+Math.sin(a)*len]],8,3);}                      // spikes first, body covers their roots
+  c.beginPath();c.moveTo(94,64);c.lineTo(114,50);c.lineTo(114,78);c.closePath();fill();   // small tail
+  c.beginPath();c.arc(64,64,31,0,7);fill();eye(50,56);
+  c.fillStyle="#102";c.fillRect(34,70,8,3);
   }else{
     const ty=f?8:-8;
     c.beginPath();c.moveTo(86,64);c.lineTo(118,40+ty);c.lineTo(118,88+ty);c.closePath();fill();
