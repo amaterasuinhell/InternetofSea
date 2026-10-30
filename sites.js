@@ -40,6 +40,41 @@ const SITES = [
   ["Scream into the void",   "https://screamintothevoid.com/", "", ""],
    ["Bored",   "https://www.bored.com/", "", ""],
   ["Voth",   "https://www.voth000.fi/", "", ""],
+   // --- Niche web development and creative coding ---
+  ["Bruno Simon",          "https://bruno-simon.com/", "", ""],
+  ["Neal.fun",             "https://neal.fun/", "", ""],
+  ["Shadertoy",            "https://www.shadertoy.com/", "", ""],
+  ["The Book of Shaders",  "https://thebookofshaders.com/", "", ""],
+  ["Codrops",              "https://tympanus.net/codrops/", "", ""],
+  ["three.js examples",    "https://threejs.org/examples/", "", ""],
+  ["Brutalist Websites",   "https://brutalistwebsites.com/", "", ""],
+  ["Awwwards",             "https://www.awwwards.com/", "", ""],
+  ["Web Design Museum",    "https://www.webdesignmuseum.org/", "", ""],
+
+  // --- Alternative culture and the strange web ---
+  ["Windows 93",           "https://www.windows93.net/", "", ""],
+  ["Cameron's World",      "https://www.cameronsworld.net/", "", ""],
+  ["Wiby",                 "https://wiby.me/", "", ""],
+  ["Neocities",            "https://neocities.org/", "", ""],
+  ["Marginalia Search",    "https://search.marginalia.nu/", "", ""],
+  ["Net Art Anthology",    "https://anthology.rhizome.org/", "", ""],
+  ["UbuWeb",               "https://ubu.com/", "", ""],
+  ["Monoskop",             "https://monoskop.org/", "", ""],
+  ["Public Domain Review", "https://publicdomainreview.org/", "", ""],
+  ["Radio Garden",         "https://radio.garden/", "", ""],
+  ["Are.na",               "https://www.are.na/", "", ""],
+
+  // --- Artistic and experimental video games ---
+  ["itch.io Experimental", "https://itch.io/games/tag-experimental", "", ""],
+  ["Molleindustria",       "https://www.molleindustria.org/", "", ""],
+  ["Pippin Barr",          "https://pippinbarr.com/", "", ""],
+  ["Sokpop Collective",    "https://sokpop.co/", "", ""],
+  ["Kokoromi",             "https://kokoromi.org/", "", ""],
+  ["A MAZE.",              "https://a-maze.org/", "", ""],
+  ["Tale of Tales",        "https://tale-of-tales.com/", "", ""],
+  ["Hundred Rabbits",      "https://100r.co/", "", ""],
+  ["PICO-8",               "https://www.lexaloffle.com/pico-8.php", "", ""],
+  ["Increpare Games",      "https://www.increpare.com/", "", ""],
  
   
   
