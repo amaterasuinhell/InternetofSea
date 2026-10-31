@@ -171,7 +171,7 @@ const SIGNS = [
 // ---------------------------------------------------------------------
 const SPRITES = [
    { frames: ["images/stickers/640x427-Whale-Humpback-markedDW.png", "images/stickers/640x427-Whale-Humpback-markedDW2.png"],
-    count: 4, size: 14, speed: 1, faces: "left", motion: "steady", fps: 1 },
+    count: 4, size: 20, speed: 2, faces: "left", motion: "steady", fps: 1 },
 
  
 ];
