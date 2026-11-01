@@ -64,8 +64,9 @@ renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));
 renderer.setSize(innerWidth,innerHeight);
 document.body.prepend(renderer.domElement);
 const scene=new THREE.Scene();
-// sea colors: lighter above, darker below; distant things fade toward the deep blue
-const SEA_TOP=0x1b32d2, SEA_MID=0x0a1498, SEA_BOTTOM=0x030748, FOG=0x08117a;
+// sea colors: lighter above, darker below; distant things fade toward the deep blue 
+//const SEA_TOP=0x1E74D9, SEA_MID=0x0a1498, SEA_BOTTOM=0x030748, FOG=0x08117a;
+  const SEA_TOP=0x1b32d2, SEA_MID=0x0a1498, SEA_BOTTOM=0x030748, FOG=0x08117a;
 scene.background=new THREE.Color(SEA_MID);
 scene.fog=new THREE.Fog(FOG,12,115);
 const dome=new THREE.Mesh(new THREE.SphereGeometry(250,24,16),new THREE.ShaderMaterial({
