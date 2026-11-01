@@ -173,12 +173,12 @@ const SPRITES = [
    { frames: ["images/stickers/640x427-Whale-Humpback-markedDW.png", "images/stickers/640x427-Whale-Humpback-markedDW2.png"],
     count: 4, size: 20, speed: 2, faces: "left", motion: "steady", fps: 1 },
  { frames: ["images/stickers/Catostylus_tagi_in_Portugala.png", "images/stickers/Catostylus_tagi_in_Portugal2a.png"],
-    count: 20, size: 2, speed: 5, faces: "left", motion: "pulse", fps: 1 },
+    count: 13, size: 2, speed: 5, faces: "left", motion: "pulse", fps: 1 },
  { frames: ["images/stickers/squid-swimming-isolated-white-background-full-body.png", "images/stickers/squid-swimming-isolated-white-background-full-body2.png"],
-    count: 20, size: 2, speed: 5, faces: "left", motion: "pulse", fps: 1 },
+    count: 12, size: 2, speed: 5, faces: "left", motion: "pulse", fps: 1 },
  { frames: ["images/stickers/normal_Aphareus_furca_153_3__mm_SL_Moorea.png", "images/stickers/normal_Aphareus_furca_153_3__mm_SL_Moorea2.png"],
-    count: 15, size: 1, speed: 7, faces: "right", motion: "steady", fps: 1 },
+    count: 7, size: 1, speed: 7, faces: "right", motion: "steady", fps: 1 },
  { frames: ["images/stickers/cooperativef.png", "images/stickers/cooperativef2.png"],
-    count: 20, size: 1, speed: 9, faces: "left", motion: "steady", fps: 1 },
+    count: 9, size: 1, speed: 9, faces: "left", motion: "steady", fps: 1 },
  
 ];
