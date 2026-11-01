@@ -172,6 +172,7 @@ const SIGNS = [
 const SPRITES = [
    { frames: ["images/stickers/640x427-Whale-Humpback-markedDW.png", "images/stickers/640x427-Whale-Humpback-markedDW2.png"],
     count: 4, size: 20, speed: 2, faces: "left", motion: "steady", fps: 1 },
-
+frames: ["images/stickers/Catostylus_tagi_in_Portugala.png", "images/stickers/Catostylus_tagi_in_Portugal2a.png"],
+    count: 20, size: 6, speed: 5, faces: "left", motion: "pulse", fps: 1 },
  
 ];
